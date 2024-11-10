@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - bp-network
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - bp-data:/app/data
+    networks:
+      - bp-network
+
+networks:
+  bp-network:
+    driver: bridge
+
+volumes:
+  bp-data:
+    driver: local

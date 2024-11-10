@@ -1,4 +1,3 @@
-import React from 'react'
 import BloodPressureTracker from './components/blood-pressure-tracker.tsx'
 
 function App() {

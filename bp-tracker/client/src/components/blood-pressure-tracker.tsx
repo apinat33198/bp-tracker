@@ -10,7 +10,23 @@ interface BPReading {
   notes: string;
 }
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = '/api';
+
+const getCurrentDateTime = () => {
+  const now = new Date();
+  return now.toISOString();
+};
+
+const formatDateTime = (timestamp: string) => {
+  return new Date(timestamp).toLocaleString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+};
 
 const BloodPressureTracker: React.FC = () => {
   const [readings, setReadings] = useState<BPReading[]>([]);
@@ -23,7 +39,6 @@ const BloodPressureTracker: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch readings from server
   useEffect(() => {
     const fetchReadings = async () => {
       try {
@@ -40,11 +55,6 @@ const BloodPressureTracker: React.FC = () => {
 
     fetchReadings();
   }, []);
-
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    return now.toISOString().slice(0, 16);
-  };
 
   const addReading = async () => {
     if (systolic && diastolic && pulse) {
@@ -85,10 +95,8 @@ const BloodPressureTracker: React.FC = () => {
     const csvContent = [
       ['Date', 'Time', 'Systolic', 'Diastolic', 'Pulse', 'Notes'].join(','),
       ...filteredReadings.map(reading => {
-        const datetime = new Date(reading.timestamp);
         return [
-          datetime.toLocaleDateString(),
-          datetime.toLocaleTimeString(),
+          formatDateTime(reading.timestamp),
           reading.systolic,
           reading.diastolic,
           reading.pulse,
@@ -101,7 +109,7 @@ const BloodPressureTracker: React.FC = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'blood-pressure-readings.csv';
+    a.download = `blood-pressure-readings-${new Date().toISOString()}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -115,6 +123,9 @@ const BloodPressureTracker: React.FC = () => {
       return readingDate >= start && readingDate <= end;
     });
   };
+
+  if (loading) return <div className="p-4">Loading...</div>;
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
@@ -187,9 +198,9 @@ const BloodPressureTracker: React.FC = () => {
         <div className="w-full overflow-x-auto">
           <LineChart width={800} height={300} data={filterReadings()}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="timestamp" />
+            <XAxis dataKey="timestamp" tickFormatter={formatDateTime} />
             <YAxis />
-            <Tooltip />
+            <Tooltip labelFormatter={formatDateTime} />
             <Legend />
             <Line type="monotone" dataKey="systolic" stroke="#8884d8" name="Systolic" />
             <Line type="monotone" dataKey="diastolic" stroke="#82ca9d" name="Diastolic" />
@@ -225,7 +236,7 @@ const BloodPressureTracker: React.FC = () => {
               {filterReadings().reverse().map((reading) => (
                 <tr key={reading.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(reading.timestamp).toLocaleString()}
+                    {formatDateTime(reading.timestamp)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {reading.systolic}
