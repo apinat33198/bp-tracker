@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY backup-service/package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy source code
+COPY backup-service/ .
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+EXPOSE 3002
+
+CMD ["node", "index.js"]

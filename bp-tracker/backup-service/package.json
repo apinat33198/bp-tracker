@@ -1,0 +1,36 @@
+{
+  "name": "bp-tracker-backup-service",
+  "version": "1.0.0",
+  "description": "Backup service for Blood Pressure Tracker",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "verify-backup": "node scripts/verify-backup.js",
+    "list-backups": "node scripts/list-backups.js",
+    "cleanup": "node scripts/cleanup-old-backups.js",
+    "backup:manual": "node scripts/trigger-backup.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1450.0",
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.21.1",
+    "node-cron": "^3.0.2",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "jest": "^29.6.3",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
